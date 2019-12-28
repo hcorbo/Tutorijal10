@@ -1,14 +1,18 @@
 package ba.unsa.etf.rpr;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Scanner;
+
 
 public class GeografijaDAO {
     private static GeografijaDAO instance = null;
     private Connection conn;
 
-    private PreparedStatement dajGradoveUpit, glavniGradUpit, dajDrzavuUpit, obrisiDrzavuUpit, nadjiDrzavuUpit,
-            obrisiGradoveZaDrzavuUpit, dodajGradUpit, odrediIdGradaUpit, dodajDrzavuUpit, odrediIdDrzaveUpit, promijeniGradUpit;
+    private PreparedStatement dajGradoveUpit, dajGradoveUpit2, glavniGradUpit, dajDrzavuUpit, obrisiDrzavuUpit, nadjiDrzavuUpit, nadjiDrzavu1,
+            obrisiGradoveZaDrzavuUpit, dodajGradUpit, odrediIdGradaUpit, dodajDrzavuUpit, promijeniGradUpit, pomDrzavaUpit;
     private GeografijaDAO() {
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
@@ -17,9 +21,15 @@ public class GeografijaDAO {
         }
 
         try {
-            glavniGradUpit = conn.prepareStatement("SELECT grad.id, grad.naziv, grad.broj_stanovnika, grad.drzava FROM grad, drzava WHERE grad.drzava = drzava.id AND drzava.glavni_grad = ?");
+            glavniGradUpit = conn.prepareStatement("SELECT grad.id, grad.naziv, grad.broj_stanovnika, grad.drzava FROM grad, drzava WHERE grad.drzava = drzava.id AND drzava.naziv = ?");
         } catch (SQLException e) {
-            e.printStackTrace();
+            regenerisiBazu();
+            try {
+                glavniGradUpit = conn.prepareStatement("SELECT grad.id, grad.naziv, grad.broj_stanovnika, grad.drzava FROM grad, drzava WHERE grad.drzava = drzava.id AND drzava.naziv = ?");
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+
         }
         try {
             dajDrzavuUpit = conn.prepareStatement("SELECT * FROM drzava WHERE id=?");
@@ -33,6 +43,11 @@ public class GeografijaDAO {
         }
         try {
             dajGradoveUpit = conn.prepareStatement("SELECT * FROM grad ORDER BY broj_stanovnika DESC");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            dajGradoveUpit2 = conn.prepareStatement( "SELECT g.id, g.naziv, g.broj_stanovnika, g.drzava FROM grad g ORDER BY g.broj_stanovnika DESC" );
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -62,16 +77,45 @@ public class GeografijaDAO {
             e.printStackTrace();
         }
         try {
-            odrediIdDrzaveUpit = conn.prepareStatement("SELECT max(id)+1 FROM drzava");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        try {
             promijeniGradUpit = conn.prepareStatement("UPDATE grad SET naziv=?, broj_stanovnika=?, drzava=? WHERE id=?");
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        try {
+            nadjiDrzavu1 = conn.prepareStatement("SELECT d.id, d.naziv, d.glavni_grad, g.id, g.naziv, g.broj_stanovnika, g.drzava FROM drzava d, grad g WHERE g.id = d.glavni_grad AND d.naziv=?");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            pomDrzavaUpit = conn.prepareStatement("SELECT d.id, d.naziv, d.glavni_grad FROM drzava d WHERE d.id = ?");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
+
+    private void regenerisiBazu() {
+        Scanner ulaz = null;
+        try {
+            ulaz = new Scanner(new FileInputStream("baza.db.sql"));
+            String sqlUpit = "";
+            while (ulaz.hasNext()) {
+                sqlUpit += ulaz.nextLine();
+                if ( sqlUpit.length() > 1 && sqlUpit.charAt( sqlUpit.length()-1 ) == ';') {
+                    try {
+                        Statement stmt = conn.createStatement();
+                        stmt.execute(sqlUpit);
+                        sqlUpit = "";
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            ulaz.close();
+    } catch (FileNotFoundException e) {
+        System.out.println("Ne postoji SQL datoteka… nastavljam sa praznom bazom");
+        }
+    }
+
     public static GeografijaDAO getInstance() {
         if(instance == null) instance = new GeografijaDAO();
         return instance;
@@ -123,7 +167,7 @@ public class GeografijaDAO {
         return drzava;
     }
 
-    public ArrayList<Grad> gradovi(){
+    public ArrayList<Grad> gradovi2(){
         ArrayList<Grad> rezultat = new ArrayList<>();
         try {
          ResultSet rs = dajGradoveUpit.executeQuery();
@@ -131,6 +175,25 @@ public class GeografijaDAO {
              Grad grad = dajGradIzResultSeta(rs);
              rezultat.add(grad);
          }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rezultat;
+    }
+
+    public ArrayList<Grad> gradovi() {
+        ArrayList<Grad> rezultat = new ArrayList<>();
+        ResultSet rs = null;
+        try {
+            rs = dajGradoveUpit2.executeQuery();
+            while(rs.next()){
+                Integer idDrzave = rs.getInt(4);
+                pomDrzavaUpit.setInt(1, idDrzave);
+                ResultSet rsDrzava = pomDrzavaUpit.executeQuery();
+                Drzava d = new Drzava(rsDrzava.getInt(1), rsDrzava.getString(2), glavniGrad(rsDrzava.getString(2)));
+                Grad g = new Grad(rs.getInt(1), rs.getString(2), rs.getInt(3), d);
+                rezultat.add(g);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -154,15 +217,31 @@ public class GeografijaDAO {
         }
     }
 
-   // public Drzava nadjiDrzavu(String drzava) {
-   // }
+    public Drzava nadjiDrzavu(String nazivDrzave){
+        Drzava drzava = null;
+        try {
+            nadjiDrzavu1.clearParameters();
+            nadjiDrzavu1.setString(1, nazivDrzave);
+            ResultSet rs = nadjiDrzavu1.executeQuery();
+            if(!rs.next()) return null;
+            drzava = new Drzava();
+            drzava.setId(rs.getInt(1));
+            drzava.setNaziv(rs.getString(2));
+           // "SELECT d.id, d.naziv, d.glavni_grad, g.id, g.naziv, g.broj_stnovnika, g.drzava FROM drzava d, grad g WHERE g.id = d.glavni_gard AND d.naziv=?");
+            Grad g = glavniGrad(nazivDrzave);
+            drzava.setGlavniGrad(g);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return drzava;
+    }
 
     public void dodajGrad(Grad grad) {
         try {
             ResultSet rs = odrediIdGradaUpit.executeQuery();
             int id = 1;
             if(rs.next()){
-                id = rs.getInt(1); //zasto get int
+                id = rs.getInt(1);
             }
             dodajGradUpit.setInt(1, id);
             dodajGradUpit.setString(2, grad.getNaziv());
@@ -176,12 +255,7 @@ public class GeografijaDAO {
 
     public void dodajDrzavu(Drzava drzava) {
         try {
-            ResultSet rs = odrediIdDrzaveUpit.executeQuery();
-            int id = 1;
-            if(rs.next()){
-                id = rs.getInt(1); //zasto get int
-            }
-            dodajDrzavuUpit.setInt(1, id);
+            dodajDrzavuUpit.setInt(1, drzava.getId());
             dodajDrzavuUpit.setString(2, drzava.getNaziv());
             dodajDrzavuUpit.setInt(3, drzava.getGlavniGrad().getId());
             dodajDrzavuUpit.executeUpdate();
