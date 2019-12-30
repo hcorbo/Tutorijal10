@@ -1,16 +1,20 @@
 package ba.unsa.etf.rpr;
 
+import javafx.beans.property.SimpleStringProperty;
+
 public class Drzava {
     private int id;
-    private String naziv;
+    private SimpleStringProperty naziv;
     private Grad glavniGrad;
 
     public Drzava() {
+        this.naziv =  new SimpleStringProperty("");
+        this.glavniGrad = null;
     }
 
     public Drzava(int id, String naziv, Grad glavniGrad) {
         this.id = id;
-        this.naziv = naziv;
+        this.naziv =  new SimpleStringProperty(naziv);
         this.glavniGrad = glavniGrad;
     }
 
@@ -22,19 +26,23 @@ public class Drzava {
         this.id = id;
     }
 
-    public String getNaziv() {
-        return naziv;
-    }
-
-    public void setNaziv(String naziv) {
-        this.naziv = naziv;
-    }
-
     public Grad getGlavniGrad() {
         return glavniGrad;
     }
 
     public void setGlavniGrad(Grad glavniGrad) {
         this.glavniGrad = glavniGrad;
+    }
+
+    public String getNaziv() {
+        return naziv.get();
+    }
+
+    public SimpleStringProperty nazivProperty() {
+        return naziv;
+    }
+
+    public void setNaziv(String naziv) {
+        this.naziv.set(naziv);
     }
 }
