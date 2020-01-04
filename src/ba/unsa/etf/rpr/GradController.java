@@ -1,7 +1,9 @@
 package ba.unsa.etf.rpr;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -21,13 +23,11 @@ public class GradController {
     public Button btnOk;
     public Button btnCancel;
 
-    private Grad gradModel;
     private Grad grad = null;
+    private ArrayList<Drzava> drzave;
     public GradController(Grad model, ArrayList<Drzava> listaDrzava) {
-        gradModel = model;
-//        GeografijaDAO dao = GeografijaDAO.getInstance();
-//        choiceDrzava.setItems(FXCollections.observableArrayList(dao.drzave()));
-        //choiceDrzava.setItems(FXCollections.observableArrayList(listaDrzava));
+        grad = model;
+        drzave = listaDrzava;
     }
 
     public void azurirajPolja(Grad p) {
@@ -38,7 +38,7 @@ public class GradController {
     @FXML
     public void initialize() {
         GeografijaDAO dao = GeografijaDAO.getInstance();
-        choiceDrzava.setItems(FXCollections.observableArrayList(dao.drzave()));
+        choiceDrzava.setItems(FXCollections.observableArrayList(drzave));
     }
 //    @FXML
 //    public void initialize() {
