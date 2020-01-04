@@ -7,14 +7,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import static javafx.scene.layout.Region.USE_COMPUTED_SIZE;
 
@@ -51,10 +50,10 @@ public class GlavnaController {
     }
 
     @FXML
-    void otvoriProzorAction(ActionEvent actionEvent) throws IOException {
+    void dodajDrzavuAction(ActionEvent actionEvent) throws IOException {
         Drzava model = new Drzava();
 //        model.napuni();
-        DrzavaController ctrl = new DrzavaController(model);
+        DrzavaController ctrl = new DrzavaController(model, dao.gradovi());
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/drzava.fxml"));
         loader.setController(ctrl);
@@ -62,6 +61,14 @@ public class GlavnaController {
         Stage stage = new Stage();
         stage.setTitle("Korisnici");
         stage.setScene(new Scene(root1, USE_COMPUTED_SIZE, USE_COMPUTED_SIZE));
+        stage.setOnHiding(windowEvent -> {
+            if(ctrl.getDrzava() == null)
+                System.out.println("Nista");
+            else {
+                dao.dodajDrzavu(ctrl.getDrzava());
+                gradovi.setAll(dao.gradovi());
+            }
+        });
         stage.show();
     }
 
@@ -69,7 +76,7 @@ public class GlavnaController {
     void otvoriGradAction(ActionEvent actionEvent) throws IOException {
         Grad model = new Grad();
 //        model.napuni();
-        GradController ctrl = new GradController(model, dao.drzave());
+        GradController ctrl = new GradController(null, dao.drzave());
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/grad.fxml"));
         loader.setController(ctrl);
@@ -90,7 +97,10 @@ public class GlavnaController {
 
     @FXML
     void izmijeniGradAction(ActionEvent actionEvent) throws IOException {
+        //Grad grad = new Grad(tableViewGradovi.getSelectionModel().getSelectedItem().getId(), tableViewGradovi.getSelectionModel().getSelectedItem().getNaziv(), tableViewGradovi.getSelectionModel().getSelectedItem().getBrojStanovnika(), tableViewGradovi.getSelectionModel().getSelectedItem().getDrzava());
         Grad grad = tableViewGradovi.getSelectionModel().getSelectedItem();
+        System.out.println(grad.getNaziv());
+        System.out.println(grad.getBrojStanovnika());
         if(grad == null) return;
 //        model.napuni();
         GradController ctrl = new GradController(grad, dao.drzave());
@@ -111,5 +121,23 @@ public class GlavnaController {
             }
         });
         stage.show();
+    }
+
+    @FXML
+    void obrisiGradAction(ActionEvent actionEvent) throws IOException {
+        Grad grad = tableViewGradovi.getSelectionModel().getSelectedItem();
+        if(grad == null) return;
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText("Look, a Confirmation Dialog");
+        alert.setContentText("Are you ok with this?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            dao.obrisiGrad(grad);
+            gradovi.setAll(dao.gradovi());
+        } else {
+            return;
+        }
     }
 }

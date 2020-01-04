@@ -46,7 +46,7 @@ public class Main extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
+
 //    @Override
 //    public void start(Stage primaryStage) throws Exception{
 //        Parent root = FXMLLoader.load(getClass().getResource("/fxml/glavna.fxml"));
@@ -83,14 +83,28 @@ public class Main extends Application {
 //        System.out.println("Glavni grad države " + drzava + " je " + grad.getNaziv() + ".");
 //    }
 //
-//    public static String ispisiGradove() {
-//        ArrayList<Grad> gradovi = GeografijaDAO.getInstance().gradovi();
-//        String rezultat = "";
+    public static String ispisiGradove() {
+        ArrayList<Grad> gradovi = GeografijaDAO.getInstance().gradovi();
+        String rezultat = "";
+        for(int i=0; i<gradovi.size(); i++){
+            Grad g = gradovi.get(i);
+            rezultat = rezultat + g.getNaziv() + " (";
+            if (g.getDrzava() != null) {
+                rezultat = rezultat + g.getDrzava().getNaziv();
+            } else { rezultat = rezultat + "nema drzave"; }
+            rezultat = rezultat + ") - " + g.getBrojStanovnika() + "\n";
+        }
 //        for(Grad g : gradovi) {
-//            rezultat += g + "\n";
+//            rezultat = g.getNaziv() + " (";
+//            if (g.getDrzava() != null) {
+//                rezultat = rezultat + g.getDrzava().getNaziv();
+//            } else { rezultat = rezultat + "nema drzave"; }
+//            rezultat = rezultat + ") - " + g.getBrojStanovnika();
+//            rezultat +="\n";
 //        }
-//        return rezultat;
-//    }
+        return rezultat;
+    }
+}
 //
 //    public static void main(String[] args) {
 //        launch(args);

@@ -26,6 +26,12 @@ public class GradController {
     private Grad grad = null;
     private ArrayList<Drzava> drzave;
     public GradController(Grad model, ArrayList<Drzava> listaDrzava) {
+        if(model == null) System.out.println("Dodavanje");
+        else{
+            fieldNaziv.setText(model.getNaziv());
+            fieldBrojStanovnika.setText(String.valueOf(model.getBrojStanovnika()));
+            choiceDrzava.setValue(model.getDrzava());
+        }
         grad = model;
         drzave = listaDrzava;
     }

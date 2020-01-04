@@ -12,7 +12,8 @@ public class GeografijaDAO {
     private Connection conn;
 
     private PreparedStatement dajGradoveUpit, dajDrzaveUpit, dajGradoveUpit2, glavniGradUpit, dajDrzavuUpit, obrisiDrzavuUpit, nadjiDrzavuUpit, nadjiDrzavu1,
-            obrisiGradoveZaDrzavuUpit, dodajGradUpit, odrediIdGradaUpit, odrediIdDrzaveUpit, dodajDrzavuUpit, promijeniGradUpit, pomDrzavaUpit, dodajDrzavuUpit2;
+            obrisiGradoveZaDrzavuUpit, dodajGradUpit, odrediIdGradaUpit, odrediIdDrzaveUpit, dodajDrzavuUpit, promijeniGradUpit, pomDrzavaUpit,
+            obrisiGradUpit, dodajDrzavuUpit2, nadjiGradUpit;
     private GeografijaDAO() {
         try {
             conn = DriverManager.getConnection("jdbc:sqlite:baza.db");
@@ -38,6 +39,11 @@ public class GeografijaDAO {
         }
         try {
             obrisiDrzavuUpit = conn.prepareStatement("DELETE FROM drzava WHERE naziv=?");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        try {
+            obrisiGradUpit = conn.prepareStatement("DELETE FROM grad WHERE naziv=?");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,7 +107,14 @@ public class GeografijaDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-       // dodajDrzavuUpit2 = conn.prepareStatement("")
+        try {
+            nadjiGradUpit = conn.prepareStatement("SELECT g.id, g.naziv, g.broj_stanovnika, g.drzava, d.id, d.naziv, d.glavni_grad " +
+                    "FROM drzava d, grad g " +
+                    "WHERE g.id = d.glavni_grad AND g.naziv=?");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // dodajDrzavuUpit2 = conn.prepareStatement("")
     }
 
     private void regenerisiBazu() {
@@ -326,5 +339,26 @@ public class GeografijaDAO {
             e.printStackTrace();
         }
         return rezultat;
+    }
+
+    public void obrisiGrad(Grad g){
+        try {
+            obrisiGradUpit.setString(1, g.getNaziv());
+            obrisiGradUpit.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public Grad nadjiGrad(String nazivGrada){
+        try {
+            nadjiGradUpit.setString(1, nazivGrada);
+            ResultSet rs = nadjiGradUpit.executeQuery();
+            Drzava d = dajDrzavu(rs.getInt(5), glavniGrad(rs.getString(6)));
+            Grad rezultat = new Grad(rs.getInt(1), rs.getString(2), rs.getInt(3), d);
+            return rezultat;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

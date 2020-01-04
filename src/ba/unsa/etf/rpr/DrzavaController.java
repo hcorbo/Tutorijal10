@@ -8,6 +8,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
+
+import java.util.ArrayList;
 
 import static javax.lang.model.SourceVersion.isName;
 
@@ -17,15 +20,17 @@ public class DrzavaController {
     public Button btnOk;
     public Button btnCancel;
 
-    private Drzava drzavaModel;
-    public DrzavaController(Drzava model) {
-        drzavaModel = model;
+    private Drzava drzava;
+    private ArrayList<Grad> gradovi;
+    public DrzavaController(Drzava model, ArrayList<Grad> listaGradova) {
+        drzava = model;
+        gradovi = listaGradova;
     }
 
     @FXML
     public void initialize() {
         GeografijaDAO dao = GeografijaDAO.getInstance();
-        choiceGrad.setItems(FXCollections.observableArrayList(dao.gradovi()));
+        choiceGrad.setItems(FXCollections.observableArrayList(gradovi));
 
     }
 //    private void azurirajPolja(GeografijaDAO dao) {
@@ -37,6 +42,11 @@ public class DrzavaController {
         if (!fieldNaziv.getText().isEmpty()) {
                 fieldNaziv.getStyleClass().removeAll("poljeNijeIspravno");
                 fieldNaziv.getStyleClass().add("poljeIspravno");
+                drzava = new Drzava();
+                drzava.setNaziv(fieldNaziv.getText());
+                drzava.setGlavniGrad(choiceGrad.getValue());
+                Stage stage = (Stage) btnOk.getScene().getWindow();
+                stage.close();
             } else {
                 fieldNaziv.getStyleClass().removeAll("poljeIspravno");
                 fieldNaziv.getStyleClass().add("poljeNijeIspravno");
@@ -52,8 +62,11 @@ public class DrzavaController {
 //        });
     }
 
-
     public void krajAction(ActionEvent actionEvent) {
         System.exit(0);
+    }
+
+    public Drzava getDrzava() {
+        return drzava;
     }
 }
