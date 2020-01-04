@@ -62,13 +62,18 @@ public class Grad {
     public void setDrzava(Drzava drzava) {
         this.drzava = drzava;
     }
+//    @Override
+//    public String toString() {
+//        String rezultat = naziv + " (";
+//        if (drzava != null) {
+//            rezultat = rezultat + drzava.getNaziv();
+//        } else { rezultat = rezultat + "nema drzave"; }
+//        rezultat = rezultat + ") - " + brojStanovnika;
+//        return  rezultat;
+//    }
+
     @Override
     public String toString() {
-        String rezultat = naziv + " (";
-        if (drzava != null) {
-            rezultat = rezultat + drzava.getNaziv();
-        } else { rezultat = rezultat + "nema drzave"; }
-        rezultat = rezultat + ") - " + brojStanovnika;
-        return  rezultat;
+        return naziv.get();
     }
 }

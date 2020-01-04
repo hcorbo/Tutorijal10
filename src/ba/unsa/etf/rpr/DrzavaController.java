@@ -1,6 +1,8 @@
 package ba.unsa.etf.rpr;
 
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,16 +24,13 @@ public class DrzavaController {
 
     @FXML
     public void initialize() {
-//        fieldNaziv.textProperty().addListener((obs, oldIme, newIme) -> {
-//            if (!fieldNaziv.getText().isEmpty()) {
-//                fieldNaziv.getStyleClass().removeAll("poljeNijeIspravno");
-//                fieldNaziv.getStyleClass().add("poljeIspravno");
-//            } else {
-//                fieldNaziv.getStyleClass().removeAll("poljeIspravno");
-//                fieldNaziv.getStyleClass().add("poljeNijeIspravno");
-//            }
-//        });
+        GeografijaDAO dao = GeografijaDAO.getInstance();
+        choiceGrad.setItems(FXCollections.observableArrayList(dao.gradovi()));
+
     }
+//    private void azurirajPolja(GeografijaDAO dao) {
+//        fieldNaziv.setText(dao.dodajGrad().getIme());
+//    }
 
     public void validirajAction(ActionEvent actionEvent) {
 

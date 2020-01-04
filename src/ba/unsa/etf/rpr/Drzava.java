@@ -45,4 +45,9 @@ public class Drzava {
     public void setNaziv(String naziv) {
         this.naziv.set(naziv);
     }
+
+    @Override
+    public String toString() {
+        return naziv.get();
+    }
 }

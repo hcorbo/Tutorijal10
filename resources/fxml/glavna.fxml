@@ -21,7 +21,7 @@
          <children>
             <Button fx:id="btnDodajGrad" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Dodaj u grad" textAlignment="CENTER" onAction="#otvoriGradAction"/>
             <Button fx:id="btnDodajDrzavu" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#otvoriProzorAction" text="Dodaj u državu" />
-        <Button fx:id="btnIzmijeniGrad" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#otvoriGradAction" text="Izmijeni grad" />
+        <Button fx:id="btnIzmijeniGrad" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#izmijeniGradAction" text="Izmijeni grad" />
             <Button fx:id="btnObrisiGrad" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Obriši grad" />
          </children>
          <padding>
