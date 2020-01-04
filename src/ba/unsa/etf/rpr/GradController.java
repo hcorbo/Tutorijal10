@@ -73,7 +73,10 @@ public class GradController {
             grad = new Grad();
             grad.setNaziv(fieldNaziv.getText());
             grad.setBrojStanovnika(Integer.parseInt(fieldBrojStanovnika.getText()));
-            grad.setDrzava(choiceDrzava.getSelectionModel().getSelectedItem());
+            Drzava d = null;
+            if(!choiceDrzava.getSelectionModel().isEmpty())
+                d = choiceDrzava.getSelectionModel().getSelectedItem();
+                grad.setDrzava(d);
 //            ((Node) (actionEvent.getSource())).getScene().getWindow().hide();
             Stage stage = (Stage) btnOk.getScene().getWindow();
             stage.close();

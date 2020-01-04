@@ -136,6 +136,7 @@ public class GlavnaController {
         if (result.get() == ButtonType.OK){
             dao.obrisiGrad(grad);
             gradovi.setAll(dao.gradovi());
+            System.out.println(tableViewGradovi.getItems().size());
         } else {
             return;
         }

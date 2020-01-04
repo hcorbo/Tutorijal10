@@ -270,7 +270,9 @@ public class GeografijaDAO {
             dodajGradUpit.setInt(1, id);
             dodajGradUpit.setString(2, grad.getNaziv());
             dodajGradUpit.setInt(3, grad.getBrojStanovnika());
+            if(grad.getDrzava()!=null)
             dodajGradUpit.setInt(4, grad.getDrzava().getId());
+            else dodajGradUpit.setInt(4, 1);
             dodajGradUpit.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

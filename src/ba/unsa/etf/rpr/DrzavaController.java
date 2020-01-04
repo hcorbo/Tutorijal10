@@ -44,7 +44,11 @@ public class DrzavaController {
                 fieldNaziv.getStyleClass().add("poljeIspravno");
                 drzava = new Drzava();
                 drzava.setNaziv(fieldNaziv.getText());
-                drzava.setGlavniGrad(choiceGrad.getValue());
+                Grad g = gradovi.get(0);
+                if(!choiceGrad.getSelectionModel().isEmpty()){
+                    g = choiceGrad.getSelectionModel().getSelectedItem();
+                }
+                drzava.setGlavniGrad(g);
                 Stage stage = (Stage) btnOk.getScene().getWindow();
                 stage.close();
             } else {
